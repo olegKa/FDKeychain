@@ -187,6 +187,14 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 						
 						break;
 					}
+						
+					case FDKeychainkAccessibleWhenUnlockedThisDeviceOnly:
+					{
+						[attributes setObject:(__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+									   forKey: (__bridge id)kSecAttrAccessible];
+						
+						break;
+					}
 				}
 				
 				OSStatus resultCode = SecItemAdd((__bridge CFDictionaryRef)attributes, NULL);
@@ -232,6 +240,14 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 					{
 						[attributesToUpdate setObject: (__bridge id)kSecAttrAccessibleAfterFirstUnlock 
 							forKey: (__bridge id)kSecAttrAccessible];
+						
+						break;
+					}
+						
+					case FDKeychainkAccessibleWhenUnlockedThisDeviceOnly:
+					{
+						[attributesToUpdate setObject:(__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+											   forKey: (__bridge id)kSecAttrAccessible];
 						
 						break;
 					}
