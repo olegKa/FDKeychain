@@ -28,7 +28,10 @@ typedef NS_ENUM(NSInteger, FDKeychainAccessibility)
 	FDKeychainAccessibleAfterFirstUnlock,
 	
 	/// Item data can only be accessed while the device is unlocked.
-	FDKeychainkAccessibleWhenUnlockedThisDeviceOnly,
+	FDKeychainAccessibleWhenUnlockedThisDeviceOnly,
+	
+	/// Item data can only be accessed once the device has been unlocked after a restart.
+	FDKeychainAccessibleAfterFirstUnlockThisDeviceOnly
 };
 
 
