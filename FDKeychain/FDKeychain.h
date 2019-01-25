@@ -31,7 +31,14 @@ typedef NS_ENUM(NSInteger, FDKeychainAccessibility)
 	FDKeychainAccessibleWhenUnlockedThisDeviceOnly,
 	
 	/// Item data can only be accessed once the device has been unlocked after a restart.
-	FDKeychainAccessibleAfterFirstUnlockThisDeviceOnly
+	FDKeychainAccessibleAfterFirstUnlockThisDeviceOnly,
+	
+	/// Item data can always
+	//	be accessed regardless of the lock state of the device.  This option
+	//	is not recommended for anything except system use. Items with this
+	//		attribute will never migrate to a new device, so after a backup is
+	//		restored to a new device, these items will be missing.
+	FDKeychainAccessibleAlwaysThisDeviceOnly
 };
 
 

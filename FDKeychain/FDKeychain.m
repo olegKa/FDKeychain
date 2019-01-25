@@ -203,6 +203,11 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 						
 						break;
 					}
+					case FDKeychainAccessibleAlwaysThisDeviceOnly:
+					{
+						[attributes setObject:(__bridge id)kSecAttrAccessibleAlwaysThisDeviceOnly
+									   forKey: (__bridge id)kSecAttrAccessible];
+					}
 				}
 				
 				OSStatus resultCode = SecItemAdd((__bridge CFDictionaryRef)attributes, NULL);
@@ -266,6 +271,11 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 									   forKey: (__bridge id)kSecAttrAccessible];
 						
 						break;
+					}
+					case FDKeychainAccessibleAlwaysThisDeviceOnly:
+					{
+						[attributesToUpdate setObject:(__bridge id)kSecAttrAccessibleAlwaysThisDeviceOnly
+											   forKey: (__bridge id)kSecAttrAccessible];
 					}
 				}
 				
