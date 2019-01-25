@@ -390,6 +390,102 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 	return deleteSuccessful;
 }
 
++ (BOOL)containsKey:(NSString *)key
+		 forService:(NSString *)service
+	  inAccessGroup:(NSString *)accessGroup
+  withAccessibility:(FDKeychainAccessibility)accessibility
+			  error:(NSError *__autoreleasing *)error
+{
+	
+	CFStringRef attrAccessible;
+	switch (accessibility) {
+		case FDKeychainAccessibleWhenUnlocked:
+		{
+			attrAccessible = kSecAttrAccessibleWhenUnlocked;
+			break;
+		}
+		case FDKeychainAccessibleAfterFirstUnlock:
+		{
+			attrAccessible =kSecAttrAccessibleAfterFirstUnlock;
+			break;
+		}
+			
+		case FDKeychainAccessibleWhenUnlockedThisDeviceOnly:
+		{
+			attrAccessible =kSecAttrAccessibleWhenUnlockedThisDeviceOnly;
+			break;
+		}
+			
+		case FDKeychainAccessibleAfterFirstUnlockThisDeviceOnly:
+		{
+			attrAccessible = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly;
+			break;
+		}
+		case FDKeychainAccessibleAlwaysThisDeviceOnly:
+		{
+			attrAccessible = kSecAttrAccessibleAlwaysThisDeviceOnly;
+			break;
+		}
+		default:
+			break;
+	}
+	
+	CFErrorRef _error = NULL;
+	SecAccessControlRef sacObject;
+	
+	if (attrAccessible) {
+		sacObject = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
+													attrAccessible,
+													kSecAccessControlUserPresence, &_error);
+	} else {
+		sacObject = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
+													kSecAttrAccessibleWhenUnlocked,
+													0, &_error);
+	}
+	
+	
+	if(sacObject == NULL || _error != NULL)
+	{
+		NSLog(@"can't create sacObject: %@", _error);
+		NSLog(@"SEC_ITEM_ADD_CAN_CREATE_OBJECT %@", _error);
+		return NO;
+	}
+	
+	// we want the operation to fail if there is an item which needs authentication so we will use
+	// kSecUseNoAuthenticationUI
+	NSDictionary *attributes = @{
+								 (__bridge id)kSecClass: (__bridge id)kSecClassGenericPassword,
+								 (__bridge id)kSecAttrService: key,
+								 (__bridge id)kSecAttrAccessControl: (__bridge id)sacObject
+								 };
+	
+	
+	OSStatus status =  SecItemAdd((__bridge CFDictionaryRef)attributes, nil);
+	BOOL res = NO;
+	
+	if (status == errSecInteractionNotAllowed) {
+		// ITEM EXIST
+		res = YES;
+	} else if (status == errSecItemNotFound) {
+		//ITEM DOES NOT EXIST
+		res = NO;
+	} else {
+		*error = [self _errorForResultCode:status withKey:key forService:service];
+	}
+	
+	return res;
+}
+
++ (BOOL)containsKey:(NSString *)key forService:(NSString *)service error:(NSError *__autoreleasing *)error
+{
+	BOOL result = [FDKeychain containsKey: key
+							   forService: service
+							inAccessGroup: nil
+						withAccessibility: FDKeychainAccessibleWhenUnlockedThisDeviceOnly
+									error: error];
+	
+	return result;
+}
 
 #pragma mark - Private Methods
 

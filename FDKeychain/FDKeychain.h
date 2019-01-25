@@ -172,4 +172,29 @@ Helper method for deleteItemForKey:forService:inAccessGroup:error: that omits th
 	error: (NSError **)error;
 
 
+
+/**
+ Helper method for check if key in keychain
+
+ @param key The key that we looking. This parameter must not be nil.
+ @param service The service that the item is associated with. This is usually the name of the application using the keychain. This parameter must not be nil.
+ @param accessGroup the access group that the item is saved to in the keychain. If this parameter is nil the first access group in the application entitlements file is used by default.
+ @param error A pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
+ @return Returns YES if the keychain contains that key
+ */
++ (BOOL)containsKey: (NSString *)key
+		 forService: (NSString *)service
+	  inAccessGroup: (NSString *)accessGroup
+  withAccessibility: (FDKeychainAccessibility)accessibility 
+			  error:(NSError **)error;
+
+/**
+ Helper method for containsKey:forService:inAccessGroup:error: that omits the access group.
+ 
+ @see containsKey:forService:inAccessGroup:error:
+ */
++ (BOOL)containsKey: (NSString *)key
+		 forService: (NSString *)service
+			  error: (NSError **)error;
+
 @end

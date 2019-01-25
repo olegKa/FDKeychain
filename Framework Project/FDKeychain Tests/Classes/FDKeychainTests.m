@@ -26,6 +26,16 @@
 	XCTAssertEqual(error.code, errSecItemNotFound);
 	
 	error = nil;
+	BOOL saveSuccessfulWithAccessibility = [FDKeychain saveItem:itemInKeychain
+														 forKey:key
+													 forService:service
+												  inAccessGroup:nil
+											  withAccessibility:FDKeychainAccessibleAlwaysThisDeviceOnly
+														  error:&error];
+	XCTAssertTrue(saveSuccessfulWithAccessibility, @"The item should have been successfully saved to the keychain.");
+	XCTAssertNil(error, @"No error should occur while saving the item to the keychain.");
+	
+	error = nil;
 	BOOL saveSuccessful = [FDKeychain saveItem: itemInKeychain 
 		forKey: key 
 		forService: service 
