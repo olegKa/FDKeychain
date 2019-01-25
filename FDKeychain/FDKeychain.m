@@ -459,10 +459,10 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 								 (__bridge id)kSecAttrAccessControl: (__bridge id)sacObject
 								 };
 	
+	CFTypeRef dataTypeRef = NULL;
+	OSStatus status =  SecItemCopyMatching((__bridge CFDictionaryRef)attributes, &dataTypeRef);
 	
-	OSStatus status =  SecItemAdd((__bridge CFDictionaryRef)attributes, nil);
 	BOOL res = NO;
-	
 	if (status == errSecInteractionNotAllowed) {
 		// ITEM EXIST
 		res = YES;
