@@ -419,7 +419,9 @@ withAccessibility: (FDKeychainAccessibility)accessibility
 		//ITEM DOES NOT EXIST
 		res = NO;
 	} else {
-		*error = [self _errorForResultCode:status withKey:key forService:service];
+		if (error) {
+			*error = [self _errorForResultCode:status withKey:key forService:service];
+		}
 	}
 	
 	return res;
