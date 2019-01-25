@@ -15,16 +15,16 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 
 #pragma mark - Public Methods
 
-+ (NSData *)rawDataForKey: (NSString *)key 
-	forService: (NSString *)service 
-	inAccessGroup: (NSString *)accessGroup 
-	error: (NSError **)error
++ (NSData *)rawDataForKey: (NSString *)key
+			   forService: (NSString *)service
+			inAccessGroup: (NSString *)accessGroup
+					error: (NSError **)error
 {
 	// Load the item from the keychain.
-	NSDictionary *itemAttributesAndData = [self _itemAttributesAndDataForKey: key 
-		forService: service 
-		inAccessGroup: accessGroup
-		error: error];
+	NSDictionary *itemAttributesAndData = [self _itemAttributesAndDataForKey: key
+																  forService: service
+															   inAccessGroup: accessGroup
+																	   error: error];
 	
 	// Extract the item's value data.
 	NSData *rawData = nil;
@@ -33,32 +33,32 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 	{
 		rawData = [itemAttributesAndData objectForKey: (__bridge id)kSecValueData];
 	}
-
-	return rawData;
-}
-
-+ (NSData *)rawDataForKey: (NSString *)key 
-	forService: (NSString *)service 
-	error: (NSError **)error
-{
-	NSData *rawData = [self rawDataForKey: key 
-		forService: service 
-		inAccessGroup: nil
-		error: error];
 	
 	return rawData;
 }
 
-+ (id)itemForKey: (NSString *)key 
-	forService: (NSString *)service 
-	inAccessGroup: (NSString *)accessGroup 
-	error: (NSError **)error
++ (NSData *)rawDataForKey: (NSString *)key
+			   forService: (NSString *)service
+					error: (NSError **)error
+{
+	NSData *rawData = [self rawDataForKey: key
+							   forService: service
+							inAccessGroup: nil
+									error: error];
+	
+	return rawData;
+}
+
++ (id)itemForKey: (NSString *)key
+	  forService: (NSString *)service
+   inAccessGroup: (NSString *)accessGroup
+		   error: (NSError **)error
 {
 	// Load the raw data for the item from the keychain.
-	NSData *rawData = [self rawDataForKey: key 
-		forService: service 
-		inAccessGroup: accessGroup 
-		error: error];
+	NSData *rawData = [self rawDataForKey: key
+							   forService: service
+							inAccessGroup: accessGroup
+									error: error];
 	
 	// Unarchive the data that was received from the keychain.
 	id item = nil;
@@ -75,13 +75,13 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 		{
 			if (error != NULL)
 			{
-				NSDictionary *userInfo = @{ 
-					NSLocalizedFailureReasonErrorKey : exception.reason 
-				};
-			
-				*error = [NSError errorWithDomain: FDKeychainErrorDomain 
-					code: FDKeychainUnarchiveErrorCode 
-					userInfo: userInfo];
+				NSDictionary *userInfo = @{
+										   NSLocalizedFailureReasonErrorKey : exception.reason
+										   };
+				
+				*error = [NSError errorWithDomain: FDKeychainErrorDomain
+											 code: FDKeychainUnarchiveErrorCode
+										 userInfo: userInfo];
 			}
 		}
 	}
@@ -89,37 +89,37 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 	return item;
 }
 
-+ (id)itemForKey: (NSString *)key 
-	forService: (NSString *)service 
-	error: (NSError **)error
++ (id)itemForKey: (NSString *)key
+	  forService: (NSString *)service
+		   error: (NSError **)error
 {
-	id item = [FDKeychain itemForKey: key 
-		forService: service 
-		inAccessGroup: nil 
-		error: error];
+	id item = [FDKeychain itemForKey: key
+						  forService: service
+					   inAccessGroup: nil
+							   error: error];
 	
 	return item;
 }
 
-+ (BOOL)saveItem: (id<NSCoding>)item 
-	forKey: (NSString *)key 
-	forService: (NSString *)service 
-	inAccessGroup: (NSString *)accessGroup 
-	withAccessibility: (FDKeychainAccessibility)accessibility
-	error: (NSError **)error
++ (BOOL)saveItem: (id<NSCoding>)item
+		  forKey: (NSString *)key
+	  forService: (NSString *)service
+   inAccessGroup: (NSString *)accessGroup
+withAccessibility: (FDKeychainAccessibility)accessibility
+		   error: (NSError **)error
 {
 	// Raise exception if either the key or the service parameter are empty.
 	if ([key length] == 0)
 	{
-		[NSException raise: NSInvalidArgumentException 
-			format: @"%s key argument cannot be empty", 
-				__PRETTY_FUNCTION__];
+		[NSException raise: NSInvalidArgumentException
+					format: @"%s key argument cannot be empty",
+		 __PRETTY_FUNCTION__];
 	}
 	else if ([service length] == 0)
 	{
-		[NSException raise: NSInvalidArgumentException 
-			format: @"%s service argument cannot be empty", 
-				__PRETTY_FUNCTION__];
+		[NSException raise: NSInvalidArgumentException
+					format: @"%s service argument cannot be empty",
+		 __PRETTY_FUNCTION__];
 	}
 	
 	// Assume the save is successful.
@@ -128,22 +128,22 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 	// If the item is nil attempt to delete it from the keychain.
 	if (item == nil)
 	{
-		saveSuccessful = [self deleteItemForKey: key 
-			forService: service 
-			error: error];
+		saveSuccessful = [self deleteItemForKey: key
+									 forService: service
+										  error: error];
 	}
 	else
 	{
 		// Load the item from the keychain for the key, service and access group to check if it already exists.
 		NSError *itemFromKeychainError = nil;
-		NSDictionary *itemFromKeychain = [self _itemAttributesAndDataForKey: key 
-			forService: service 
-			inAccessGroup: accessGroup 
-			error: &itemFromKeychainError];
+		NSDictionary *itemFromKeychain = [self _itemAttributesAndDataForKey: key
+																 forService: service
+															  inAccessGroup: accessGroup
+																	  error: &itemFromKeychainError];
 		
 		// If any error except "Item Not Found" occured when checking if the item existed immediately fail out.
-		if (itemFromKeychain == nil 
-			 && [itemFromKeychainError code] != errSecItemNotFound)
+		if (itemFromKeychain == nil
+			&& [itemFromKeychainError code] != errSecItemNotFound)
 		{
 			// Return NO because checking if the item existed failed.
 			saveSuccessful = NO;
@@ -163,27 +163,27 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 			// If the item does not exist add it to the keychain.
 			if (itemFromKeychain == nil)
 			{
-				NSMutableDictionary *attributes = [FDKeychain _baseQueryDictionaryForKey: key 
-					forService: service 
-					inAccessGroup: accessGroup];
+				NSMutableDictionary *attributes = [FDKeychain _baseQueryDictionaryForKey: key
+																			  forService: service
+																		   inAccessGroup: accessGroup];
 				
-				[attributes setObject: valueData 
-					forKey: (__bridge id)kSecValueData];
+				[attributes setObject: valueData
+							   forKey: (__bridge id)kSecValueData];
 				
 				switch (accessibility)
 				{
 					case FDKeychainAccessibleWhenUnlocked:
 					{
-						[attributes setObject: (__bridge id)kSecAttrAccessibleWhenUnlocked 
-							forKey: (__bridge id)kSecAttrAccessible];
+						[attributes setObject: (__bridge id)kSecAttrAccessibleWhenUnlocked
+									   forKey: (__bridge id)kSecAttrAccessible];
 						
 						break;
 					}
-					
+						
 					case FDKeychainAccessibleAfterFirstUnlock:
 					{
-						[attributes setObject: (__bridge id)kSecAttrAccessibleAfterFirstUnlock 
-							forKey: (__bridge id)kSecAttrAccessible];
+						[attributes setObject: (__bridge id)kSecAttrAccessibleAfterFirstUnlock
+									   forKey: (__bridge id)kSecAttrAccessible];
 						
 						break;
 					}
@@ -207,6 +207,7 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 					{
 						[attributes setObject:(__bridge id)kSecAttrAccessibleAlwaysThisDeviceOnly
 									   forKey: (__bridge id)kSecAttrAccessible];
+						break;
 					}
 				}
 				
@@ -221,38 +222,38 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 					// If an error pointer was passed in update the pointer with an error object describing the problem.
 					if (error != NULL)
 					{
-						*error = [self _errorForResultCode: resultCode 
-							withKey: key 
-							forService: service];
+						*error = [self _errorForResultCode: resultCode
+												   withKey: key
+												forService: service];
 					}
 				}
 			}
 			// If the item does exist update the item in the keychain.
 			else
 			{
-				NSDictionary *queryDictionary = [FDKeychain _baseQueryDictionaryForKey: key 
-					forService: service 
-					inAccessGroup: accessGroup];
+				NSDictionary *queryDictionary = [FDKeychain _baseQueryDictionaryForKey: key
+																			forService: service
+																		 inAccessGroup: accessGroup];
 				
-				NSMutableDictionary *attributesToUpdate = [NSMutableDictionary dictionaryWithObjectsAndKeys: 
-					valueData, 
-					(__bridge id)kSecValueData, 
-					nil];
+				NSMutableDictionary *attributesToUpdate = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+														   valueData,
+														   (__bridge id)kSecValueData,
+														   nil];
 				
 				switch (accessibility)
 				{
 					case FDKeychainAccessibleWhenUnlocked:
 					{
-						[attributesToUpdate setObject: (__bridge id)kSecAttrAccessibleWhenUnlocked 
-							forKey: (__bridge id)kSecAttrAccessible];
+						[attributesToUpdate setObject: (__bridge id)kSecAttrAccessibleWhenUnlocked
+											   forKey: (__bridge id)kSecAttrAccessible];
 						
 						break;
 					}
-					
+						
 					case FDKeychainAccessibleAfterFirstUnlock:
 					{
-						[attributesToUpdate setObject: (__bridge id)kSecAttrAccessibleAfterFirstUnlock 
-							forKey: (__bridge id)kSecAttrAccessible];
+						[attributesToUpdate setObject: (__bridge id)kSecAttrAccessibleAfterFirstUnlock
+											   forKey: (__bridge id)kSecAttrAccessible];
 						
 						break;
 					}
@@ -268,7 +269,7 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 					case FDKeychainAccessibleAfterFirstUnlockThisDeviceOnly:
 					{
 						[attributesToUpdate setObject:(__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-									   forKey: (__bridge id)kSecAttrAccessible];
+											   forKey: (__bridge id)kSecAttrAccessible];
 						
 						break;
 					}
@@ -276,6 +277,7 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 					{
 						[attributesToUpdate setObject:(__bridge id)kSecAttrAccessibleAlwaysThisDeviceOnly
 											   forKey: (__bridge id)kSecAttrAccessible];
+						break;
 					}
 				}
 				
@@ -290,9 +292,9 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 					// If an error pointer was passed in update the pointer with an error object describing the problem.
 					if (error != NULL)
 					{
-						*error = [self _errorForResultCode: resultCode 
-							withKey: key 
-							forService: service];
+						*error = [self _errorForResultCode: resultCode
+												   withKey: key
+												forService: service];
 					}
 				}
 			}
@@ -302,47 +304,47 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 	return saveSuccessful;
 }
 
-+ (BOOL)saveItem: (id<NSCoding>)item 
-	forKey: (NSString *)key 
-	forService: (NSString *)service 
-	error: (NSError **)error
++ (BOOL)saveItem: (id<NSCoding>)item
+		  forKey: (NSString *)key
+	  forService: (NSString *)service
+		   error: (NSError **)error
 {
-	BOOL saveSuccessful = [FDKeychain saveItem: item 
-		forKey: key 
-		forService: service 
-		inAccessGroup: nil 
+	BOOL saveSuccessful = [FDKeychain saveItem: item
+		forKey: key
+		forService: service
+		inAccessGroup: nil
 		withAccessibility: FDKeychainAccessibleWhenUnlockedThisDeviceOnly
 		error: error];
 	
 	return saveSuccessful;
 }
 
-+ (BOOL)deleteItemForKey: (NSString *)key 
-	forService: (NSString *)service 
-	inAccessGroup: (NSString *)accessGroup 
-	error: (NSError **)error
++ (BOOL)deleteItemForKey: (NSString *)key
+			  forService: (NSString *)service
+		   inAccessGroup: (NSString *)accessGroup
+				   error: (NSError **)error
 {
 	// Raise exception if either the key or the service parameter are empty.
 	if ([key length] == 0)
 	{
-		[NSException raise: NSInvalidArgumentException 
-			format: @"%s key argument cannot be empty", 
-				__PRETTY_FUNCTION__];
+		[NSException raise: NSInvalidArgumentException
+					format: @"%s key argument cannot be empty",
+		 __PRETTY_FUNCTION__];
 	}
 	else if ([service length] == 0)
 	{
-		[NSException raise: NSInvalidArgumentException 
-			format: @"%s service argument cannot be empty", 
-				__PRETTY_FUNCTION__];
+		[NSException raise: NSInvalidArgumentException
+					format: @"%s service argument cannot be empty",
+		 __PRETTY_FUNCTION__];
 	}
 	
 	// Assume the delete will succeed.
 	BOOL deleteSuccessful = YES;
 	
 	// Delete the item from the keychain.
-	NSDictionary *queryDictionary = [FDKeychain _baseQueryDictionaryForKey: key 
-		forService: service 
-		inAccessGroup: accessGroup];
+	NSDictionary *queryDictionary = [FDKeychain _baseQueryDictionaryForKey: key
+																forService: service
+															 inAccessGroup: accessGroup];
 	
 	OSStatus resultCode = SecItemDelete((__bridge CFDictionaryRef)queryDictionary);
 	
@@ -355,22 +357,22 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 		// If an error pointer was passed in update the pointer with an error object describing the problem.
 		if (error != NULL)
 		{
-			*error = [self _errorForResultCode: resultCode 
-				withKey: key 
-				forService: service];
+			*error = [self _errorForResultCode: resultCode
+									   withKey: key
+									forService: service];
 			
 			// If the delete failed bacause the item did not exist in the keychain create a more descriptive error message.
 			if ([*error code] == errSecItemNotFound)
 			{
-				NSString *localizedDescription = [NSString stringWithFormat: @"Could not delete item with key '%@' for service '%@' from the keychain because it does not exist.", 
-					key, 
-					service];
+				NSString *localizedDescription = [NSString stringWithFormat: @"Could not delete item with key '%@' for service '%@' from the keychain because it does not exist.",
+												  key,
+												  service];
 				NSDictionary *userInfo = @{ NSLocalizedDescriptionKey : localizedDescription,
-					 NSUnderlyingErrorKey : *error };
+											NSUnderlyingErrorKey : *error };
 				
-				*error = [NSError errorWithDomain: FDKeychainErrorDomain 
-					code: resultCode 
-					userInfo: userInfo];
+				*error = [NSError errorWithDomain: FDKeychainErrorDomain
+											 code: resultCode
+										 userInfo: userInfo];
 			}
 		}
 	}
@@ -378,14 +380,14 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 	return deleteSuccessful;
 }
 
-+ (BOOL)deleteItemForKey: (NSString *)key 
-	forService: (NSString *)service 
-	error: (NSError **)error
++ (BOOL)deleteItemForKey: (NSString *)key
+			  forService: (NSString *)service
+				   error: (NSError **)error
 {
-	BOOL deleteSuccessful = [FDKeychain deleteItemForKey: key 
-		forService: service 
-		inAccessGroup: nil 
-		error: error];
+	BOOL deleteSuccessful = [FDKeychain deleteItemForKey: key
+											  forService: service
+										   inAccessGroup: nil
+												   error: error];
 	
 	return deleteSuccessful;
 }
@@ -393,77 +395,24 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 + (BOOL)containsKey:(NSString *)key
 		 forService:(NSString *)service
 	  inAccessGroup:(NSString *)accessGroup
-  withAccessibility:(FDKeychainAccessibility)accessibility
 			  error:(NSError *__autoreleasing *)error
 {
 	
-	CFStringRef attrAccessible;
-	switch (accessibility) {
-		case FDKeychainAccessibleWhenUnlocked:
-		{
-			attrAccessible = kSecAttrAccessibleWhenUnlocked;
-			break;
-		}
-		case FDKeychainAccessibleAfterFirstUnlock:
-		{
-			attrAccessible =kSecAttrAccessibleAfterFirstUnlock;
-			break;
-		}
-			
-		case FDKeychainAccessibleWhenUnlockedThisDeviceOnly:
-		{
-			attrAccessible =kSecAttrAccessibleWhenUnlockedThisDeviceOnly;
-			break;
-		}
-			
-		case FDKeychainAccessibleAfterFirstUnlockThisDeviceOnly:
-		{
-			attrAccessible = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly;
-			break;
-		}
-		case FDKeychainAccessibleAlwaysThisDeviceOnly:
-		{
-			attrAccessible = kSecAttrAccessibleAlwaysThisDeviceOnly;
-			break;
-		}
-		default:
-			break;
-	}
+	// Load the item from the keychain that matches the key, service and access group.
+	NSMutableDictionary *queryDictionary = [FDKeychain _baseQueryDictionaryForKey: key
+																	   forService: service
+																	inAccessGroup: accessGroup];
 	
-	CFErrorRef _error = NULL;
-	SecAccessControlRef sacObject;
+	[queryDictionary setObject: (__bridge id)kSecMatchLimitOne     forKey: (__bridge id)kSecMatchLimit];
+	[queryDictionary setObject: (id)kCFBooleanTrue                 forKey: (__bridge id)kSecReturnAttributes];
+	[queryDictionary setObject: (id)kCFBooleanTrue                 forKey: (__bridge id)kSecReturnData];
 	
-	if (attrAccessible) {
-		sacObject = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
-													attrAccessible,
-													kSecAccessControlUserPresence, &_error);
-	} else {
-		sacObject = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
-													kSecAttrAccessibleWhenUnlocked,
-													0, &_error);
-	}
+	CFTypeRef itemAttributesAndDataTypeRef = nil;
 	
-	
-	if(sacObject == NULL || _error != NULL)
-	{
-		NSLog(@"can't create sacObject: %@", _error);
-		NSLog(@"SEC_ITEM_ADD_CAN_CREATE_OBJECT %@", _error);
-		return NO;
-	}
-	
-	// we want the operation to fail if there is an item which needs authentication so we will use
-	// kSecUseNoAuthenticationUI
-	NSDictionary *attributes = @{
-								 (__bridge id)kSecClass: (__bridge id)kSecClassGenericPassword,
-								 (__bridge id)kSecAttrService: key,
-								 (__bridge id)kSecAttrAccessControl: (__bridge id)sacObject
-								 };
-	
-	CFTypeRef dataTypeRef = NULL;
-	OSStatus status =  SecItemCopyMatching((__bridge CFDictionaryRef)attributes, &dataTypeRef);
+	OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)queryDictionary, &itemAttributesAndDataTypeRef);
 	
 	BOOL res = NO;
-	if (status == errSecInteractionNotAllowed) {
+	if (status == errSecSuccess) {
 		// ITEM EXIST
 		res = YES;
 	} else if (status == errSecItemNotFound) {
@@ -481,7 +430,6 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 	BOOL result = [FDKeychain containsKey: key
 							   forService: service
 							inAccessGroup: nil
-						withAccessibility: FDKeychainAccessibleWhenUnlockedThisDeviceOnly
 									error: error];
 	
 	return result;
@@ -489,9 +437,9 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 
 #pragma mark - Private Methods
 
-+ (NSError *)_errorForResultCode: (OSStatus)resultCode 
-	withKey: (NSString *)key 
-	forService: (NSString *)service
++ (NSError *)_errorForResultCode: (OSStatus)resultCode
+						 withKey: (NSString *)key
+					  forService: (NSString *)service
 {
 	NSString *localizedDescription = nil;
 	
@@ -499,31 +447,31 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 	{
 		case errSecDuplicateItem:
 		{
-			localizedDescription = [NSString stringWithFormat: @"Item with key '%@' for service '%@' already exists in the keychain.", 
-				key, 
-				service];
+			localizedDescription = [NSString stringWithFormat: @"Item with key '%@' for service '%@' already exists in the keychain.",
+									key,
+									service];
 			
 			break;
 		}
-		
+			
 		case errSecItemNotFound:
 		{
-			localizedDescription = [NSString stringWithFormat: @"Item with key '%@' for service '%@' could not be found in the keychain.", 
-				key, 
-				service];
+			localizedDescription = [NSString stringWithFormat: @"Item with key '%@' for service '%@' could not be found in the keychain.",
+									key,
+									service];
 			
 			break;
 		}
-		
+			
 		case errSecInteractionNotAllowed:
 		{
-			localizedDescription = [NSString stringWithFormat: @"Interaction with key '%@' for service '%@' was not allowed. It is possible that the item is only accessible when the device is unlocked and this query is happening when the app is in the background. Double-check your item permissions.", 
-				key, 
-				service];
+			localizedDescription = [NSString stringWithFormat: @"Interaction with key '%@' for service '%@' was not allowed. It is possible that the item is only accessible when the device is unlocked and this query is happening when the app is in the background. Double-check your item permissions.",
+									key,
+									service];
 			
 			break;
 		}
-
+			
 		default:
 		{
 			localizedDescription = @"This is a undefined error. Check SecBase.h or Apple's iOS Developer Library for more information on this Keychain Services error code.";
@@ -532,73 +480,70 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 		}
 	}
 	
-	NSError *error = [NSError errorWithDomain: FDKeychainErrorDomain 
-		code: resultCode 
-		userInfo: @{ NSLocalizedDescriptionKey : localizedDescription }];
+	NSError *error = [NSError errorWithDomain: FDKeychainErrorDomain
+										 code: resultCode
+									 userInfo: @{ NSLocalizedDescriptionKey : localizedDescription }];
 	
 	return error;
 }
 
-+ (NSMutableDictionary *)_baseQueryDictionaryForKey: (NSString *)key 
-	forService: (NSString *)service 
-	inAccessGroup: (NSString *)accessGroup
++ (NSMutableDictionary *)_baseQueryDictionaryForKey: (NSString *)key
+										 forService: (NSString *)service
+									  inAccessGroup: (NSString *)accessGroup
 {
 	// Create dictionary that will be the basis for all queries against the keychain.
-	NSMutableDictionary *baseQueryDictionary = [[NSMutableDictionary alloc] 
-		initWithCapacity: 4];
+	NSMutableDictionary *baseQueryDictionary = [[NSMutableDictionary alloc]
+												initWithCapacity: 4];
 	
-	[baseQueryDictionary setObject: (__bridge id)kSecClassGenericPassword 
-		forKey: (__bridge id)kSecClass];
+	[baseQueryDictionary setObject: (__bridge id)kSecClassGenericPassword
+							forKey: (__bridge id)kSecClass];
 	
-	[baseQueryDictionary setObject: key 
-		forKey: (__bridge id)kSecAttrAccount];
+	[baseQueryDictionary setObject: key
+							forKey: (__bridge id)kSecAttrAccount];
 	
-	[baseQueryDictionary setObject: service 
-		forKey: (__bridge id)kSecAttrService];
+	[baseQueryDictionary setObject: service
+							forKey: (__bridge id)kSecAttrService];
 	
 #if TARGET_IPHONE_SIMULATOR
 	// Note: If we are running in the Simulator we cannot set the access group. Apps running in the Simulator are not signed so there is no access group for them to check. All apps running in the simulator can see all the keychain items. If you need to test apps that share access groups you will need to install the apps on a device.
 #else
 	if ([accessGroup length] > 0)
 	{
-		[baseQueryDictionary setObject: accessGroup 
-			forKey: (__bridge id)kSecAttrAccessGroup];
+		[baseQueryDictionary setObject: accessGroup
+								forKey: (__bridge id)kSecAttrAccessGroup];
 	}
 #endif
 	
 	return baseQueryDictionary;
 }
 
-+ (NSDictionary *)_itemAttributesAndDataForKey: (NSString *)key 
-	forService: (NSString *)service 
-	inAccessGroup: (NSString *)accessGroup 
-	error: (NSError **)error
++ (NSDictionary *)_itemAttributesAndDataForKey: (NSString *)key
+									forService: (NSString *)service
+								 inAccessGroup: (NSString *)accessGroup
+										 error: (NSError **)error
 {
 	// Raise exception if either the key or the service parameter are empty.
 	if ([key length] == 0)
 	{
-		[NSException raise: NSInvalidArgumentException 
-			format: @"%s key argument cannot be empty", 
-				__PRETTY_FUNCTION__];
+		[NSException raise: NSInvalidArgumentException
+					format: @"%s key argument cannot be empty",
+		 __PRETTY_FUNCTION__];
 	}
 	else if ([service length] == 0)
 	{
-		[NSException raise: NSInvalidArgumentException 
-			format: @"%s service argument cannot be empty", 
-				__PRETTY_FUNCTION__];
+		[NSException raise: NSInvalidArgumentException
+					format: @"%s service argument cannot be empty",
+		 __PRETTY_FUNCTION__];
 	}
 	
 	// Load the item from the keychain that matches the key, service and access group.
-	NSMutableDictionary *queryDictionary = [FDKeychain _baseQueryDictionaryForKey: key 
-		forService: service 
-		inAccessGroup: accessGroup];
+	NSMutableDictionary *queryDictionary = [FDKeychain _baseQueryDictionaryForKey: key
+																	   forService: service
+																	inAccessGroup: accessGroup];
 	
-	[queryDictionary setObject: (__bridge id)kSecMatchLimitOne 
-		forKey: (__bridge id)kSecMatchLimit];
-	[queryDictionary setObject: (id)kCFBooleanTrue 
-		forKey: (__bridge id)kSecReturnAttributes];
-	[queryDictionary setObject: (id)kCFBooleanTrue 
-		forKey: (__bridge id)kSecReturnData];
+	[queryDictionary setObject: (__bridge id)kSecMatchLimitOne 	forKey: (__bridge id)kSecMatchLimit];
+	[queryDictionary setObject: (id)kCFBooleanTrue 				forKey: (__bridge id)kSecReturnAttributes];
+	[queryDictionary setObject: (id)kCFBooleanTrue 				forKey: (__bridge id)kSecReturnData];
 	
 	CFTypeRef itemAttributesAndDataTypeRef = nil;
 	
@@ -610,16 +555,16 @@ NSString * const FDKeychainErrorDomain = @"com.1414degrees.keychain";
 	{
 		if (error != NULL)
 		{
-			*error = [self _errorForResultCode: resultCode 
-				withKey: key 
-				forService: service];
+			*error = [self _errorForResultCode: resultCode
+									   withKey: key
+									forService: service];
 		}
 	}
 	else
 	{
 		itemAttributesAndData = (__bridge_transfer NSDictionary *)itemAttributesAndDataTypeRef;
 	}
-
+	
 	return itemAttributesAndData;
 }
 

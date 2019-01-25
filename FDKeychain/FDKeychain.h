@@ -185,8 +185,7 @@ Helper method for deleteItemForKey:forService:inAccessGroup:error: that omits th
 + (BOOL)containsKey: (NSString *)key
 		 forService: (NSString *)service
 	  inAccessGroup: (NSString *)accessGroup
-  withAccessibility: (FDKeychainAccessibility)accessibility 
-			  error:(NSError **)error;
+			  error: (NSError **)error;
 
 /**
  Helper method for containsKey:forService:inAccessGroup:error: that omits the access group.
